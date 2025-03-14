@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const createIssueSchema = z.object({
@@ -8,7 +8,13 @@ const createIssueSchema = z.object({
 
 export async function POST(request: NextRequest) {
     const body = await request.json();
-    createIssueSchema.parse(body);
+    const validation = createIssueSchema.safeParse(body);
+
+    if (!validation.success) {
+        return NextResponse.json(validation.error.errors, { status: 400 }); // client error 
+    } else {
+        return NextResponse.json(validation.data.title, {status: 200});
+    }
 }
 
 export async function GET(request: NextRequest) {
