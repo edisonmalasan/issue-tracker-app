@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, TextField, Callout, Text } from "@radix-ui/themes";
+import { Button, TextField, Callout, Text, Spinner } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import SimpleMDE from "react-simplemde-editor";
 import { useForm, Controller } from "react-hook-form";
@@ -27,6 +27,7 @@ const NewIssuePage = () => {
   });
 
   const [error, setError] = useState("");
+  const [isSubmission, setSubmitting] = useState(false);
 
   return (
     <div className="max-w-xl ">
@@ -42,9 +43,11 @@ const NewIssuePage = () => {
         className="space-y-5"
         onSubmit={handleSubmit(async (data) => {
           try {
+            setSubmitting(true);
             await axios.post("/api/issues", data);
             router.push("/issues");
           } catch (error) {
+            setSubmitting(false);
             setError("Unexpected Error Occurred.");
           }
         })}
@@ -68,7 +71,9 @@ const NewIssuePage = () => {
         />
         <ErrorMessage>{errors.description?.message}</ErrorMessage>
 
-        <Button>Submit New Issue</Button>
+        <Button disabled={isSubmission}>
+          Submit New Issue {isSubmission && <Spinner />}
+        </Button>
       </form>
     </div>
   );
